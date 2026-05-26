@@ -1,0 +1,16 @@
+scoring:
+  aggregation: Sum
+  defaults:
+    bySeverity:
+      Critical: 50
+      High: 20
+      Medium: 5
+      Low: 1
+
+policies:
+  - name: block-critical-vulns
+    blockMode: Hard
+    conditions:
+      anyOf:
+        - findingType: Vulnerability
+          severity: Critical

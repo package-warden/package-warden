@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exceptions &#x2014; Package Warden</title>
+  <link rel="stylesheet" href="/ui/styles.css">
+</head>
+<body>
+  <nav>
+    <strong>Package Warden</strong>
+    <a href="/ui">Dashboard</a>
+    <a href="/ui/requests">Request Log</a>
+    <a href="/ui/exceptions">Exceptions</a>
+    <a href="/ui/server-info">Server Info</a>
+  </nav>
+  <main>
+    <h2>Exceptions</h2>
+    <div class="filters">
+      <label>Status
+        <select id="f-active">
+          <option value="">All</option>
+          <option value="true">Active</option>
+          <option value="false">Revoked</option>
+        </select>
+      </label>
+      <button onclick="load(1)">Filter</button>
+    </div>
+    <div id="results">Loading...</div>
+    <div class="pagination" id="pagination"></div>
+  </main>
+  <script>
+    let currentPage = 1;
+
+    function formatId(compositeId) {
+      const sep = compositeId.indexOf(':');
+      return sep > 0 ? compositeId.substring(sep + 1) : compositeId;
+    }
+
+    function formatDate(iso) {
+      return new Date(iso).toLocaleString();
+    }
+
+    async function load(page) {
+      currentPage = page;
+      const active = document.getElementById('f-active').value;
+      const qs = new URLSearchParams({ page, pageSize: 50 });
+      if (active !== '') qs.set('active', active);
+      const r = await fetch('/api/v1/exceptions?' + qs);
+      const data = await r.json();
+      renderTable(data);
+      renderPagination(data);
+    }
+
+    function renderTable(data) {
+      if (data.items.length === 0) {
+        document.getElementById('results').innerHTML = '<p class="empty">No exceptions found.</p>';
+        return;
+      }
+      const rows = data.items.map(ex => {
+        const statusBadge = ex.isActive
+          ? '<span class="badge-active">Active</span>'
+          : '<span class="badge-revoked">Revoked</span>';
+        const findingLabels = ex.findingIds.map(formatId).join('<br>');
+        const notes = ex.notes ? `<div class="notes-text">${escHtml(ex.notes)}</div>` : '';
+        const sourceLink = ex.grantedForRequestId
+          ? `<a href="/ui/requests/${ex.grantedForRequestId}">View request</a>`
+          : '&mdash;';
+        const revokeBtn = ex.isActive
+          ? `<button class="revoke-btn" onclick="revoke('${ex.exceptionId}')">Revoke</button>`
+          : '&mdash;';
+        return `<tr>
+          <td>${escHtml(ex.ecosystem)}</td>
+          <td>${escHtml(ex.packageName)}</td>
+          <td>${escHtml(ex.packageVersion ?? '')}</td>
+          <td>${formatDate(ex.grantedAt)}${ex.revokedAt ? '<br><span style="color:#6b7280;font-size:0.8rem">Revoked ' + formatDate(ex.revokedAt) + '</span>' : ''}</td>
+          <td>${statusBadge}</td>
+          <td><div class="finding-ids">${findingLabels || '&mdash;'}</div>${notes}</td>
+          <td>${sourceLink}</td>
+          <td>${revokeBtn}</td>
+        </tr>`;
+      }).join('');
+      document.getElementById('results').innerHTML = `
+        <table>
+          <thead><tr>
+            <th>Ecosystem</th><th>Package</th><th>Version</th>
+            <th>Granted / Revoked</th><th>Status</th>
+            <th>Excepted Findings</th><th>Source</th><th></th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    }
+
+    function renderPagination(data) {
+      const pages = [];
+      for (let i = 1; i <= data.totalPages; i++)
+        pages.push(`<button class="${i === data.page ? 'active' : ''}" onclick="load(${i})">${i}</button>`);
+      document.getElementById('pagination').innerHTML = pages.join('');
+    }
+
+    async function revoke(id) {
+      if (!confirm('Revoke this exception? Future downloads will be subject to policy checks again.')) return;
+      const r = await fetch('/api/v1/exceptions/' + id, { method: 'DELETE' });
+      if (r.ok) load(currentPage);
+      else alert('Failed to revoke exception. Please try again.');
+    }
+
+    function escHtml(s) {
+      return (s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    load(1);
+  </script>
+</body>
+</html>

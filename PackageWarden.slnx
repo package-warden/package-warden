@@ -1,0 +1,27 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PackageWarden.Analyzers.OpenSourceMalware/PackageWarden.Analyzers.OpenSourceMalware.csproj" />
+    <Project Path="src/PackageWarden.Analyzers.OsvDev/PackageWarden.Analyzers.OsvDev.csproj" />
+    <Project Path="src/PackageWarden.Analyzers.SourceRepository/PackageWarden.Analyzers.SourceRepository.csproj" />
+    <Project Path="src/PackageWarden.Core/PackageWarden.Core.csproj" />
+    <Project Path="src/PackageWarden.Host/PackageWarden.Host.csproj" />
+    <Project Path="src/PackageWarden.Kv.Directory/PackageWarden.Kv.Directory.csproj" />
+    <Project Path="src/PackageWarden.Proxy.Cargo/PackageWarden.Proxy.Cargo.csproj" />
+    <Project Path="src/PackageWarden.Proxy.Gem/PackageWarden.Proxy.Gem.csproj" />
+    <Project Path="src/PackageWarden.Proxy.Golang/PackageWarden.Proxy.Golang.csproj" />
+    <Project Path="src/PackageWarden.Proxy.Maven/PackageWarden.Proxy.Maven.csproj" />
+    <Project Path="src/PackageWarden.Proxy.Npm/PackageWarden.Proxy.Npm.csproj" />
+    <Project Path="src/PackageWarden.Proxy.NuGet/PackageWarden.Proxy.NuGet.csproj" />
+    <Project Path="src/PackageWarden.Proxy.PyPI/PackageWarden.Proxy.PyPI.csproj" />
+    <Project Path="src/PackageWarden.Store.Sqlite/PackageWarden.Store.Sqlite.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PackageWarden.Analyzers.OpenSourceMalware.Tests/PackageWarden.Analyzers.OpenSourceMalware.Tests.csproj" />
+    <Project Path="tests/PackageWarden.Analyzers.OsvDev.Tests/PackageWarden.Analyzers.OsvDev.Tests.csproj" />
+    <Project Path="tests/PackageWarden.Analyzers.SourceRepository.Tests/PackageWarden.Analyzers.SourceRepository.Tests.csproj" />
+    <Project Path="tests/PackageWarden.Core.Tests/PackageWarden.Core.Tests.csproj" />
+    <Project Path="tests/PackageWarden.Integration.Tests/PackageWarden.Integration.Tests.csproj" />
+    <Project Path="tests/PackageWarden.Kv.Directory.Tests/PackageWarden.Kv.Directory.Tests.csproj" />
+    <Project Path="tests/PackageWarden.Store.Sqlite.Tests/PackageWarden.Store.Sqlite.Tests.csproj" />
+  </Folder>
+</Solution>

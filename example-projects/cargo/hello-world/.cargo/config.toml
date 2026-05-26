@@ -1,0 +1,5 @@
+[source.crates-io]
+replace-with = "package-warden"
+
+[source.package-warden]
+registry = "sparse+http://localhost:5050/v1/proxy/cargo/"

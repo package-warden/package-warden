@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Package Warden</title>
+  <link rel="stylesheet" href="/ui/styles.css">
+</head>
+<body>
+  <nav>
+    <strong>Package Warden</strong>
+    <a href="/ui">Dashboard</a>
+    <a href="/ui/requests">Request Log</a>
+    <a href="/ui/exceptions">Exceptions</a>
+    <a href="/ui/server-info">Server Info</a>
+  </nav>
+  <main>
+    <h2>Dashboard</h2>
+    <div class="cards" id="stats">
+      <div class="card"><h3>Total Requests</h3><div class="value" id="total">&#x2014;</div></div>
+      <div class="card"><h3>Blocked</h3><div class="value" id="blocked">&#x2014;</div></div>
+      <div class="card"><h3>Allowed</h3><div class="value" id="allowed">&#x2014;</div></div>
+    </div>
+    <h2>Recent Requests</h2>
+    <div id="recent-requests">Loading...</div>
+  </main>
+  <script>
+    async function loadStats() {
+      const r = await fetch('/api/v1/stats');
+      const data = await r.json();
+      document.getElementById('total').textContent = data.totalRequests;
+      document.getElementById('blocked').textContent = data.blockedRequests;
+      document.getElementById('allowed').textContent = data.allowedRequests;
+    }
+    async function loadRecent() {
+      const r = await fetch('/api/v1/requests?pageSize=10');
+      const data = await r.json();
+      const rows = data.items.map(req => `
+        <tr>
+          <td>${new Date(req.timestamp).toLocaleString()}</td>
+          <td>${req.ecosystem}</td>
+          <td>${req.packageName}</td>
+          <td>${req.packageVersion ?? ''}</td>
+          <td class="${req.blocked ? 'blocked' : 'allowed'}">${req.blocked ? 'Blocked' : 'Allowed'}</td>
+          <td><a href="/ui/requests/${req.requestId}">Details</a></td>
+        </tr>`).join('');
+      document.getElementById('recent-requests').innerHTML = `
+        <table>
+          <thead><tr><th>Time</th><th>Ecosystem</th><th>Package</th><th>Version</th><th>Outcome</th><th></th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="6">No requests yet</td></tr>'}</tbody>
+        </table>`;
+    }
+    loadStats();
+    loadRecent();
+    setInterval(() => { loadStats(); loadRecent(); }, 30000);
+  </script>
+</body>
+</html>

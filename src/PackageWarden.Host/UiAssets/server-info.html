@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Server Info &#x2014; Package Warden</title>
+  <link rel="stylesheet" href="/ui/styles.css">
+</head>
+<body>
+  <nav>
+    <strong>Package Warden</strong>
+    <a href="/ui">Dashboard</a>
+    <a href="/ui/requests">Request Log</a>
+    <a href="/ui/exceptions">Exceptions</a>
+    <a href="/ui/server-info">Server Info</a>
+  </nav>
+  <main>
+    <h2>Server Info</h2>
+    <table class="server-table">
+      <tbody>
+        <tr><th>appsettings.json</th><td>{{APP_SETTINGS_PATH}}</td></tr>
+        <tr><th>policy.yaml</th><td>{{POLICY_FILE_PATH}}</td></tr>
+        <tr><th>Data directory</th><td>{{DATA_DIRECTORY}}</td></tr>
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>

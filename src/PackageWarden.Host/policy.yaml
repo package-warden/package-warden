@@ -1,0 +1,54 @@
+scoring:
+  aggregation: Sum
+
+  defaults:
+    bySeverity:
+      Critical: 50
+      High: 20
+      Medium: 5
+      Low: 1
+      Info: 0
+
+  byFindingType:
+    Vulnerability:
+      scoreFromCvss: false
+      cvssScale: 5
+      bySeverity:
+        Critical: 50
+        High: 20
+        Medium: 5
+        Low: 1
+
+policies:
+  - name: block-malware
+    blockMode: Hard
+    conditions:
+      anyOf:
+        - findingType: Malware
+
+  - name: block-critical-cves
+    blockMode: Hard
+    conditions:
+      anyOf:
+        - findingType: Vulnerability
+          severity: Critical
+
+  - name: block-cvss-critical
+    blockMode: Hard
+    conditions:
+      anyOf:
+        - findingType: Vulnerability
+          cvssScore: ">= 9.0"
+
+  - name: vulnerability-risk-score
+    blockMode: Score
+    conditions:
+      scoreExceeds:
+        threshold: 50
+        findingType: Vulnerability
+
+  - name: combined-risk-gate
+    blockMode: Score
+    conditions:
+      scoreExceeds:
+        threshold: 50

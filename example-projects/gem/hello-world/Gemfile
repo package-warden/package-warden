@@ -1,0 +1,3 @@
+source 'http://localhost:5050/v1/proxy/gem'
+
+gem 'colorize', '0.8.1'

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Request Log &#x2014; Package Warden</title>
+  <link rel="stylesheet" href="/ui/styles.css">
+</head>
+<body>
+  <nav>
+    <strong>Package Warden</strong>
+    <a href="/ui">Dashboard</a>
+    <a href="/ui/requests">Request Log</a>
+    <a href="/ui/exceptions">Exceptions</a>
+    <a href="/ui/server-info">Server Info</a>
+  </nav>
+  <main>
+    <h2>Request Log</h2>
+    <div class="filters">
+      <label>Ecosystem <select id="f-eco"><option value="">All</option><option>npm</option><option>nuget</option><option>pypi</option><option>maven</option><option>cargo</option><option>gem</option><option>golang</option></select></label>
+      <label>Outcome <select id="f-blocked"><option value="">All</option><option value="true">Blocked</option><option value="false">Allowed</option></select></label>
+      <label>Package <input id="f-pkg" type="text" placeholder="search..."></label>
+      <button onclick="loadRequests(1)">Filter</button>
+    </div>
+    <div id="results">Loading...</div>
+    <div class="pagination" id="pagination"></div>
+  </main>
+  <script>
+    function durationMs(s) {
+      if (!s) return null;
+      const p = s.split(':');
+      return Math.round((+p[0] * 3600 + +p[1] * 60 + parseFloat(p[2])) * 1000);
+    }
+    let currentPage = 1;
+    async function loadRequests(page) {
+      currentPage = page;
+      const eco = document.getElementById('f-eco').value;
+      const blocked = document.getElementById('f-blocked').value;
+      const pkg = document.getElementById('f-pkg').value;
+      const qs = new URLSearchParams({ page, pageSize: 50 });
+      if (eco) qs.set('ecosystem', eco);
+      if (blocked !== '') qs.set('blocked', blocked);
+      if (pkg) qs.set('packageName', pkg);
+      const r = await fetch('/api/v1/requests?' + qs);
+      const data = await r.json();
+      renderTable(data);
+      renderPagination(data);
+    }
+    function renderTable(data) {
+      const rows = data.items.map(req => `
+        <tr>
+          <td>${new Date(req.timestamp).toLocaleString()}</td>
+          <td>${req.ecosystem}</td>
+          <td>${req.packageName}</td>
+          <td>${req.packageVersion ?? ''}</td>
+          <td>${req.clientIp}</td>
+          <td class="${req.blocked ? 'blocked' : 'allowed'}">${req.blocked ? 'Blocked' : 'Allowed'}</td>
+          <td>${durationMs(req.duration) != null ? durationMs(req.duration) + 'ms' : ''}</td>
+          <td><a href="/ui/requests/${req.requestId}">Details</a></td>
+        </tr>`).join('');
+      document.getElementById('results').innerHTML = `
+        <table>
+          <thead><tr><th>Time</th><th>Ecosystem</th><th>Package</th><th>Version</th><th>Client IP</th><th>Outcome</th><th>Duration</th><th></th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="8">No results</td></tr>'}</tbody>
+        </table>`;
+    }
+    function renderPagination(data) {
+      const pages = [];
+      for (let i = 1; i <= data.totalPages; i++) {
+        pages.push(`<button class="${i === data.page ? 'active' : ''}" onclick="loadRequests(${i})">${i}</button>`);
+      }
+      document.getElementById('pagination').innerHTML = pages.join('');
+    }
+    loadRequests(1);
+  </script>
+</body>
+</html>

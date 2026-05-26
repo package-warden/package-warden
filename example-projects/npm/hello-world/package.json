@@ -1,0 +1,9 @@
+{
+  "name": "npm-hello",
+  "version": "1.0.0",
+  "description": "Hello World via package-warden npm proxy",
+  "main": "index.js",
+  "dependencies": {
+    "chalk": "4.1.2"
+  }
+}

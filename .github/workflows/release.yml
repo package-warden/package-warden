@@ -1,0 +1,83 @@
+name: Release
+
+on:
+  workflow_dispatch
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: echo "VERSION=$(cat semver.txt | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish linux-x64
+        run: |
+          dotnet publish src/PackageWarden.Host/PackageWarden.Host.csproj \
+            -c Release -r linux-x64 --self-contained true \
+            -p:PublishSingleFile=true -p:DebugType=none \
+            -o publish/linux-x64
+
+      - name: Publish linux-arm64
+        run: |
+          dotnet publish src/PackageWarden.Host/PackageWarden.Host.csproj \
+            -c Release -r linux-arm64 --self-contained true \
+            -p:PublishSingleFile=true -p:DebugType=none \
+            -o publish/linux-arm64
+
+      - name: Publish win-x64
+        run: |
+          dotnet publish src/PackageWarden.Host/PackageWarden.Host.csproj \
+            -c Release -r win-x64 --self-contained true \
+            -p:PublishSingleFile=true -p:DebugType=none \
+            -o publish/win-x64
+
+      - name: Publish osx-x64
+        run: |
+          dotnet publish src/PackageWarden.Host/PackageWarden.Host.csproj \
+            -c Release -r osx-x64 --self-contained true \
+            -p:PublishSingleFile=true -p:DebugType=none \
+            -o publish/osx-x64
+
+      - name: Publish osx-arm64
+        run: |
+          dotnet publish src/PackageWarden.Host/PackageWarden.Host.csproj \
+            -c Release -r osx-arm64 --self-contained true \
+            -p:PublishSingleFile=true -p:DebugType=none \
+            -o publish/osx-arm64
+
+      - name: Package
+        env:
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: |
+          mkdir -p dist
+
+          for RID in linux-x64 linux-arm64 osx-x64 osx-arm64; do
+            mv "publish/$RID/PackageWarden.Host" "publish/$RID/package-warden"
+            cp package-warden.sh setup-package-managers.sh "publish/$RID/"
+            chmod +x "publish/$RID/package-warden" "publish/$RID/package-warden.sh" "publish/$RID/setup-package-managers.sh"
+            tar -czf "dist/package-warden-$VERSION-$RID.tar.gz" -C "publish/$RID" .
+          done
+
+          mv publish/win-x64/PackageWarden.Host.exe publish/win-x64/package-warden.exe
+          cp package-warden.bat setup-package-managers.bat publish/win-x64/
+          (cd publish/win-x64 && zip -r "../../dist/package-warden-$VERSION-win-x64.zip" .)
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: |
+          gh release create "v$VERSION" \
+            --title "v$VERSION" \
+            --generate-notes \
+            dist/*
