@@ -35,28 +35,29 @@ public static class NpmProxyEndpoints
         // Scoped package manifest
         group.MapGet("/@{scope}/{name}", async (
             string scope, string name,
-            IProxyPipeline pipeline,
             IOptions<NpmProxyOptions> opts,
             HttpContext ctx) =>
         {
             var log = ctx.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("PackageWarden.Proxy.Npm");
             log.LogDebug("[npm] manifest: @{Scope}/{Name}", scope, name);
             var upstream = $"{opts.Value.UpstreamBaseUrl}/@{scope}/{name}";
-            await ServeManifestAsync(ctx, pipeline, scope + "/" + name, upstream, opts.Value.UpstreamBaseUrl);
+            await ServeManifestAsync(ctx, upstream, opts.Value.UpstreamBaseUrl);
         });
 
-        // Unscoped package manifest
+        // Unscoped package manifest — also handles %2f-encoded scoped names (@scope%2fname)
         group.MapGet("/{name}", async (
             string name,
-            IProxyPipeline pipeline,
             IOptions<NpmProxyOptions> opts,
             HttpContext ctx) =>
         {
-            if (name.StartsWith('@')) return;
+            // ASP.NET Core does not decode %2f in route parameters; do it explicitly.
+            // A bare @scope with no package name is not a valid request.
+            var decodedName = Uri.UnescapeDataString(name);
+            if (decodedName.StartsWith('@') && !decodedName.Contains('/')) return;
             var log = ctx.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("PackageWarden.Proxy.Npm");
-            log.LogDebug("[npm] manifest: {Name}", name);
-            var upstream = $"{opts.Value.UpstreamBaseUrl}/{name}";
-            await ServeManifestAsync(ctx, pipeline, name, upstream, opts.Value.UpstreamBaseUrl);
+            log.LogDebug("[npm] manifest: {Name}", decodedName);
+            var upstream = $"{opts.Value.UpstreamBaseUrl}/{decodedName}";
+            await ServeManifestAsync(ctx, upstream, opts.Value.UpstreamBaseUrl);
         });
 
         // Scoped tarball download
@@ -79,20 +80,21 @@ public static class NpmProxyEndpoints
                 EvaluatePolicy: true));
         });
 
-        // Unscoped tarball download
+        // Unscoped tarball download — also handles %2f-encoded scoped names (@scope%2fname)
         group.MapGet("/{name}/-/{filename}", async (
             string name, string filename,
             IProxyPipeline pipeline,
             IOptions<NpmProxyOptions> opts,
             HttpContext ctx) =>
         {
+            var decodedName = Uri.UnescapeDataString(name);
             var version = ExtractVersionFromFilename(filename);
             var log = ctx.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("PackageWarden.Proxy.Npm");
-            log.LogDebug("[npm] download: {Name} {Version}", name, version);
-            var upstream = $"{opts.Value.UpstreamBaseUrl}/{name}/-/{filename}";
+            log.LogDebug("[npm] download: {Name} {Version}", decodedName, version);
+            var upstream = $"{opts.Value.UpstreamBaseUrl}/{decodedName}/-/{filename}";
             await pipeline.HandleAsync(new ProxyPipelineRequest(
                 Ecosystem: "npm",
-                PackageName: name,
+                PackageName: decodedName,
                 PackageVersion: version,
                 UpstreamUrl: upstream,
                 HttpContext: ctx,
@@ -102,8 +104,6 @@ public static class NpmProxyEndpoints
 
     private static async Task ServeManifestAsync(
         HttpContext ctx,
-        IProxyPipeline pipeline,
-        string packageName,
         string upstreamUrl,
         string upstreamBase)
     {
