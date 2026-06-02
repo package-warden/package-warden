@@ -13,6 +13,7 @@
     <ProjectReference Include="..\PackageWarden.Kv.Directory\PackageWarden.Kv.Directory.csproj" />
     <ProjectReference Include="..\PackageWarden.Analyzers.OsvDev\PackageWarden.Analyzers.OsvDev.csproj" />
     <ProjectReference Include="..\PackageWarden.Analyzers.OpenSourceMalware\PackageWarden.Analyzers.OpenSourceMalware.csproj" />
+    <ProjectReference Include="..\PackageWarden.Analyzers.OssfMaliciousPackages\PackageWarden.Analyzers.OssfMaliciousPackages.csproj" />
     <ProjectReference Include="..\PackageWarden.Analyzers.SourceRepository\PackageWarden.Analyzers.SourceRepository.csproj" />
     <ProjectReference Include="..\PackageWarden.Proxy.Npm\PackageWarden.Proxy.Npm.csproj" />
     <ProjectReference Include="..\PackageWarden.Proxy.NuGet\PackageWarden.Proxy.NuGet.csproj" />

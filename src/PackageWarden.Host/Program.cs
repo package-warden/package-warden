@@ -15,6 +15,7 @@
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Options;
 using PackageWarden.Analyzers.OpenSourceMalware;
+using PackageWarden.Analyzers.OssfMaliciousPackages;
 using PackageWarden.Analyzers.OsvDev;
 using PackageWarden.Analyzers.SourceRepository;
 using PackageWarden.Core.Domain;
@@ -107,6 +108,11 @@ builder.Services.Configure<OpenSourceMalwareOptions>(
     builder.Configuration.GetSection("PackageWarden:Analyzers:OpenSourceMalware"));
 builder.Services.AddPackageAnalyzer<OpenSourceMalwareAnalyzer>();
 
+// Configure OssfMaliciousPackages analyzer
+builder.Services.Configure<OssfMaliciousPackagesOptions>(
+    builder.Configuration.GetSection("PackageWarden:Analyzers:OssfMaliciousPackages"));
+builder.Services.AddPackageAnalyzer<OssfMaliciousPackagesAnalyzer>();
+
 // Configure SourceRepository analyzer
 builder.Services.Configure<SourceRepositoryOptions>(
     builder.Configuration.GetSection("PackageWarden:Analyzers:SourceRepository"));
@@ -178,6 +184,14 @@ builder.Services.AddHttpClient("sourcerepo-github", client =>
     client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
     client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
     var token = builder.Configuration["PackageWarden:Analyzers:SourceRepository:GitHubToken"];
+    if (!string.IsNullOrWhiteSpace(token))
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+});
+
+builder.Services.AddHttpClient("ossf-malicious-packages", client =>
+{
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("PackageWarden/1.0 (package-security-proxy)");
+    var token = builder.Configuration["PackageWarden:Analyzers:OssfMaliciousPackages:GitHubToken"];
     if (!string.IsNullOrWhiteSpace(token))
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 });
