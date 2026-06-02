@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/PackageWarden.Analyzers.OpenSourceMalware/PackageWarden.Analyzers.OpenSourceMalware.csproj" />
+    <Project Path="src/PackageWarden.Analyzers.OssfMaliciousPackages/PackageWarden.Analyzers.OssfMaliciousPackages.csproj" />
     <Project Path="src/PackageWarden.Analyzers.OsvDev/PackageWarden.Analyzers.OsvDev.csproj" />
     <Project Path="src/PackageWarden.Analyzers.SourceRepository/PackageWarden.Analyzers.SourceRepository.csproj" />
     <Project Path="src/PackageWarden.Core/PackageWarden.Core.csproj" />
@@ -17,6 +18,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/PackageWarden.Analyzers.OpenSourceMalware.Tests/PackageWarden.Analyzers.OpenSourceMalware.Tests.csproj" />
+    <Project Path="tests/PackageWarden.Analyzers.OssfMaliciousPackages.Tests/PackageWarden.Analyzers.OssfMaliciousPackages.Tests.csproj" />
     <Project Path="tests/PackageWarden.Analyzers.OsvDev.Tests/PackageWarden.Analyzers.OsvDev.Tests.csproj" />
     <Project Path="tests/PackageWarden.Analyzers.SourceRepository.Tests/PackageWarden.Analyzers.SourceRepository.Tests.csproj" />
     <Project Path="tests/PackageWarden.Core.Tests/PackageWarden.Core.Tests.csproj" />

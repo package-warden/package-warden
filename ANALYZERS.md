@@ -166,6 +166,62 @@ Under `PackageWarden:Analyzers:OpenSourceMalware` in `appsettings.json`:
 
 ---
 
+## OSSF Malicious Packages analyzer
+
+**Assembly:** `PackageWarden.Analyzers.OssfMaliciousPackages`  
+**Class:** `OssfMaliciousPackagesAnalyzer`  
+**Produces:** `Malware`  
+**Enabled by default:** Yes — no credentials required for public access
+
+Checks packages against the [OSSF Malicious Packages](https://github.com/ossf/malicious-packages) database, a community-maintained registry of confirmed malicious open source packages. Each entry in the database is a structured [OSV](https://osv.dev)-format report that identifies specific compromised versions. Any package found in the database is flagged `Critical`.
+
+### How it works
+
+For each package download, the analyzer queries the GitHub Contents API to check whether a directory for that package exists under `packages/{ecosystem}/{name}` in the `ossf/malicious-packages` repository. A `404` response means the package is not in the database. A `200` response means at least one malicious report exists: the analyzer then fetches each report's `osv.json` from `raw.githubusercontent.com` to extract the OSV summary and list of confirmed malicious versions. Results are cached by `{ecosystem}:{name}` for the configured TTL so that subsequent requests for any version of the same package do not incur additional API calls.
+
+If the requested version appears in the `affected[].versions` list of any report, the OSV summary is used verbatim. Otherwise the summary is annotated with the set of confirmed malicious versions from the database, making it clear that a known-bad version exists even if the requested version is not explicitly listed.
+
+### Ecosystem support
+
+| Proxy ecosystem | OSSF directory |
+|-----------------|---------------|
+| `npm`    | `npm`        |
+| `pypi`   | `pypi`       |
+| `nuget`  | `nuget`      |
+| `maven`  | `maven`      |
+| `cargo`  | `crates.io`  |
+| `gem`    | `rubygems`   |
+| `golang` | `go`         |
+
+PyPI package names are normalized to lowercase with underscores replaced by hyphens before the lookup, matching the canonical form used in the OSSF database.
+
+### Rate limiting
+
+The GitHub Contents API allows **60 unauthenticated requests per hour** per IP address. Providing a GitHub token raises this to 5,000 per hour. Without a token, the 60-request budget is shared across all package checks that miss the cache. For higher-traffic deployments a token is strongly recommended.
+
+The raw content host (`raw.githubusercontent.com`) is not subject to the GitHub API rate limit and is used for fetching OSV report files.
+
+### Configuration
+
+Under `PackageWarden:Analyzers:OssfMaliciousPackages` in `appsettings.json`:
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `Enabled` | `true` | Set to `false` to skip OSSF analysis entirely |
+| `CacheTtlMinutes` | `60` | How long to cache the lookup result per `{ecosystem}:{name}`. The result covers all versions of the package |
+| `GitHubToken` | _(empty)_ | Optional GitHub personal access token. Without one, the unauthenticated rate limit of 60 requests/hour applies |
+| `GitHubApiUrl` | `https://api.github.com` | GitHub API base URL — override for GitHub Enterprise or testing |
+| `GitHubRawUrl` | `https://raw.githubusercontent.com` | Raw content base URL — override for testing |
+
+### Limitations
+
+- The database covers only packages that have been reported and merged; newly discovered malware may not appear immediately.
+- Version matching depends on reporters having listed explicit versions in the OSV `affected[].versions` field. If a report omits version details, the package is still flagged but the summary will not identify a specific version as confirmed.
+- The GitHub API rate limit (60 req/hour unauthenticated) constrains how many distinct packages can be checked per hour before cached results are exhausted. A GitHub token is recommended for production use.
+- Up to 10 report files are fetched per package; packages with more than 10 reports will have their later entries ignored (uncommon in practice).
+
+---
+
 ## Source repository analyzer
 
 **Assembly:** `PackageWarden.Analyzers.SourceRepository`  
