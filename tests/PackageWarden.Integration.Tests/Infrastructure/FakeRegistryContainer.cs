@@ -43,6 +43,9 @@ public class FakeRegistryContainer : IAsyncLifetime
             .WithResourceMapping(
                 File.ReadAllBytes(Path.Combine(fixtures, "npm", "tarball.tgz")),
                 "/usr/share/nginx/html/tarball.tgz")
+            .WithResourceMapping(
+                File.ReadAllBytes(Path.Combine(fixtures, "npm", "scoped-test-package.json")),
+                "/usr/share/nginx/html/npm-scoped-test-package.json")
             // nuget
             .WithResourceMapping(
                 File.ReadAllBytes(Path.Combine(fixtures, "nuget", "v3-index.json")),

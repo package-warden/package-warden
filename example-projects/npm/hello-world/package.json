@@ -4,6 +4,7 @@
   "description": "Hello World via package-warden npm proxy",
   "main": "index.js",
   "dependencies": {
+    "@microsoft/applicationinsights-web-snippet": "^1.2.3",
     "chalk": "4.1.2"
   }
 }

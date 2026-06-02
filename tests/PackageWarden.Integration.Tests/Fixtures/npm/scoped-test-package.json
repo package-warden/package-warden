@@ -1,0 +1,15 @@
+{
+  "name": "@test-scope/test-package",
+  "dist-tags": { "latest": "1.0.0" },
+  "versions": {
+    "1.0.0": {
+      "name": "@test-scope/test-package",
+      "version": "1.0.0",
+      "description": "A fake scoped package for integration testing",
+      "dist": {
+        "tarball": "http://registry.npmjs.org/@test-scope/test-package/-/test-package-1.0.0.tgz",
+        "shasum": "abc123def456abc123def456abc123def456abc123"
+      }
+    }
+  }
+}
