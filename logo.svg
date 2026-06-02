@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <clipPath id="s">
+      <path d="M110,58 L402,58 Q420,58 420,76 L420,315 Q420,420 256,472 Q92,420 92,315 L92,76 Q92,58 110,58 Z"/>
+    </clipPath>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="60%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#0A0F1E"/>
+    </linearGradient>
+    <linearGradient id="scanGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#22C55E" stop-opacity="0.0"/>
+      <stop offset="50%"  stop-color="#22C55E" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#22C55E" stop-opacity="0.0"/>
+    </linearGradient>
+    <linearGradient id="borderGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#60A5FA"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Shield background -->
+  <path d="M110,58 L402,58 Q420,58 420,76 L420,315 Q420,420 256,472 Q92,420 92,315 L92,76 Q92,58 110,58 Z"
+        fill="url(#bg)"/>
+
+  <g clip-path="url(#s)">
+
+    <!-- Isometric box: top face (illuminated) -->
+    <polygon points="156,230 256,177 356,230 256,283" fill="#94A3B8"/>
+
+    <!-- Isometric box: left face (shadow) -->
+    <polygon points="156,230 256,283 256,376 156,323" fill="#1E293B"/>
+
+    <!-- Isometric box: right face (front-lit) -->
+    <polygon points="256,283 356,230 356,323 256,376" fill="#334155"/>
+
+    <!-- Top face: cardboard flap seam lines (cross of two center lines) -->
+    <!-- Front-to-back center: left-point to right-point midpoint -->
+    <line x1="156" y1="230" x2="356" y2="230" stroke="#64748B" stroke-width="1.5" opacity="0.8"/>
+    <!-- Left-to-right center: top-point to front-point -->
+    <line x1="256" y1="177" x2="256" y2="283" stroke="#64748B" stroke-width="1.5" opacity="0.8"/>
+
+    <!-- Box lid seam: horizontal line across right face -->
+    <line x1="256" y1="308" x2="356" y2="255" stroke="#475569" stroke-width="2"/>
+    <!-- Box lid seam: horizontal line across left face -->
+    <line x1="156" y1="255" x2="256" y2="308" stroke="#2D3748" stroke-width="2"/>
+
+    <!-- Label on right face (white sticker with metadata lines) -->
+    <polygon points="276,311 336,282 336,342 276,371" fill="#F8FAFC" opacity="0.92"/>
+    <!-- Label lines (text rows in perspective) -->
+    <line x1="283" y1="318" x2="329" y2="295" stroke="#94A3B8" stroke-width="3" stroke-linecap="round"/>
+    <line x1="283" y1="331" x2="320" y2="314" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="283" y1="343" x2="315" y2="327" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Scan line: soft glow -->
+    <rect x="92" y="310" width="328" height="60" fill="url(#scanGlow)"/>
+    <!-- Scan line: hard core -->
+    <rect x="92" y="333" width="328" height="10" fill="#22C55E" opacity="0.92"/>
+
+  </g>
+
+  <!-- Shield border -->
+  <path d="M110,58 L402,58 Q420,58 420,76 L420,315 Q420,420 256,472 Q92,420 92,315 L92,76 Q92,58 110,58 Z"
+        fill="none" stroke="url(#borderGlow)" stroke-width="7" stroke-linejoin="round"/>
+
+</svg>
