@@ -45,6 +45,7 @@ Out of the box, Package Warden:
 - Looks up each package's declared source repository and verifies the requested version exists in GitHub releases and tags
 - Applies the bundled `policy.yaml`, which blocks packages with critical CVEs, CVSS >= 9.0, a flood of medium vulnerabilities, and high combined risk scores
 - Caches analyzer responses to avoid redundant lookups
+- Periodically clears local package manager caches so packages are always re-fetched through the proxy rather than served from a local cache that bypasses inspection
 - Allows any package that does not match a blocking rule
 
 If no `policy.yaml` is present at startup, all packages are allowed through and requests are still recorded.
@@ -226,6 +227,7 @@ Configuration lives in `appsettings.json`. All keys are under the `PackageWarden
 | `Analyzers.SourceRepository.ReleaseCacheTtlMinutes` | `60` | How long to cache GitHub release and tag lists |
 | `Analyzers.SourceRepository.GitHubToken` | _(empty)_ | Optional GitHub personal access token - raises the API rate limit from 60 to 5,000 requests/hour |
 | `KeyValueCache.EvictionIntervalMinutes` | `15` | How often the cache eviction background task runs |
+| `PackageManagerCacheClear.IntervalMinutes` | `10` | How often (in minutes) to clear local package manager caches (npm, NuGet, pip, gem, go) |
 
 To disable a proxy for an ecosystem you do not use, set `"Enabled": false` for that entry.
 
