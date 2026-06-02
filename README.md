@@ -6,6 +6,12 @@ All requests are recorded regardless of outcome. You can see what was allowed, r
 
 NOTE: This project is in a pre-release state and ~~may~~ will have bugs. It is not a magic solution for all the issues surrounding software supply chain risk. It is just another layer of defense. I have done some manual testing, but the package management ecosystem can be complicated, so I'm sure there are plenty of corner cases that haven't been covered.
 
+## Project Goals
+
+There's already plenty of commercially supported products on the market catering to large enterprises. But nothing that really addressed incorporating additional security controls like this into existing developer workflows for the OSS maintainer, contributor, or hobbyist (well nothing I could find).
+
+I suspect, at the moment, that some of the analysis and rules may be too cautious and will need to be fine tuned. Especially to cater for differences between package ecosystems. The aim is to have a really low noise to signal ratio and for this to be low effort. If this tool introduces too much friction, people simply won't use it. So feedback is more than welcome.
+
 ## Quick start
 
 Download the latest release for your platform from the [releases page](https://github.com/YOUR_ORG/package-warden/releases), extract the archive, and start the proxy:
